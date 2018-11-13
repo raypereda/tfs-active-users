@@ -1,5 +1,5 @@
 # tfs-active-users
-Team Foundation Server (TFS) utility that lists users that have made at least 10 change sets in the last year.
+This is a Team Foundation Server (TFS) utility that lists users that have made at least 10 change sets in the last year.
 
 I use this to count the number of active user at Molina Healthcare. [Semmle](https://semmle.com/), the security source code company, only charges for active users!
 
