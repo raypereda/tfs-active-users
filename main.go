@@ -14,8 +14,9 @@ import (
 var collection string
 var minCheckins int
 var is2010 bool
-var tfs2010Collections = [18]string{"CareSystems", "ClaimsEncounters", "CoreSystems","CorpSystemsNon-Erp", "CRM", "DBA","DefaultCollection","Encounters", "E-portal", "ITOps","Octo","ODSDWBI",
-"PRELEX","Provider-Eligibility-Extracts","QNXT-Reports-Utilities","Security","SOA","TCIM"}
+var tfs2010Collections = [18]string{"CareSystems", "ClaimsEncounters", "CoreSystems", "CorpSystemsNon-Erp", "CRM",
+	"DBA", "DefaultCollection", "Encounters", "E-portal", "ITOps", "Octo", "ODSDWBI",
+	"PRELEX", "Provider-Eligibility-Extracts", "QNXT-Reports-Utilities", "Security", "SOA", "TCIM"}
 var rootPath string
 
 func main() {
@@ -23,15 +24,15 @@ func main() {
 	flag.IntVar(&minCheckins, "mincheckins", 10, "minimum number of check-ins for active users")
 	flag.BoolVar(&is2010, "2010", false, "Use the 2010 Repo")
 	flag.Parse()
-	h := make([]string,0)
-	if(!is2010){
+	var h []string
+	if !is2010 {
 		rootPath = path()
 		h = history()
-		
-	}else{
+
+	} else {
 		rootPath = "$/"
 		h = history2010()
-		
+
 	}
 	c := countByUser(h)
 	print(c)
@@ -54,17 +55,17 @@ func dateRange() string {
 	spec := fmt.Sprintf(versionSpec, yearAgoDate, nowDate)
 	return spec
 }
-func history2010()[]string{
-	combined := make([]string,0)
-	collection2010 :="http://dc01tfspv02:8080/tfs/"
+func history2010() []string {
+	combined := make([]string, 0)
+	collection2010 := "http://dc01tfspv02:8080/tfs/"
 	for _, c := range tfs2010Collections {
-        collection = collection2010+ c;
-		h:= history()
-		if(len(h) > 2){ //if there is a history within the date range
-			combined=append(combined,h[2:]...)
+		collection = collection2010 + c
+		h := history()
+		if len(h) > 2 { //if there is a history within the date range
+			combined = append(combined, h[2:]...)
 		}
-		
-    }
+
+	}
 	return combined
 }
 func history() []string {
