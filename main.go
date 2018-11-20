@@ -13,15 +13,28 @@ import (
 
 var collection string
 var minCheckins int
+var is2010 bool
+var tfs2010Collections = [18]string{"CareSystems", "ClaimsEncounters", "CoreSystems", "CorpSystemsNon-Erp", "CRM",
+	"DBA", "DefaultCollection", "Encounters", "E-portal", "ITOps", "Octo", "ODSDWBI",
+	"PRELEX", "Provider-Eligibility-Extracts", "QNXT-Reports-Utilities", "Security", "SOA", "TCIM"}
+var rootPath string
 
 func main() {
 	flag.StringVar(&collection, "collection", "http://tfs.molina.mhc:8080/tfs/HSS/", "TFS collection URL")
 	flag.IntVar(&minCheckins, "mincheckins", 10, "minimum number of check-ins for active users")
+	flag.BoolVar(&is2010, "2010", false, "Use the 2010 Repo")
 	flag.Parse()
+	var h []string
+	if !is2010 {
+		rootPath = path()
+		h = history()
 
-	h := history()
+	} else {
+		rootPath = "$/"
+		h = history2010()
+
+	}
 	c := countByUser(h)
-
 	print(c)
 }
 
@@ -42,10 +55,22 @@ func dateRange() string {
 	spec := fmt.Sprintf(versionSpec, yearAgoDate, nowDate)
 	return spec
 }
+func history2010() []string {
+	combined := make([]string, 0)
+	collection2010 := "http://dc01tfspv02:8080/tfs/"
+	for _, c := range tfs2010Collections {
+		collection = collection2010 + c
+		h := history()
+		if len(h) > 2 { //if there is a history within the date range
+			combined = append(combined, h[2:]...)
+		}
 
+	}
+	return combined
+}
 func history() []string {
 	cmdline := "tf history /collection:" + collection +
-		" " + path() + " /recursive " + dateRange() + " /noprompt"
+		" " + rootPath + " /recursive " + dateRange() + " /noprompt"
 	fmt.Println("executing the command line below")
 	fmt.Println(cmdline)
 	fmt.Println()
@@ -59,7 +84,7 @@ func history() []string {
 
 	cmd := exec.Command("tf", "history",
 		"/collection:"+collection,
-		path(),
+		rootPath,
 		"/recursive",
 		dateRange(),
 		"/noprompt")
